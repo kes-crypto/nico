@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" type="text/css" href="./main.css">          
+        <title>Pluma</title>
+        <style>
+            body {
+                animation-name: background;
+                animation-duration: 10s;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+            }
+        </style>
+        <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+        <script src="http://code.jquery.com/jquery-2.1.4.js"></script>
+        <script>
+            socket.emit('requestPage', 'calendar', function (html) {
+                document.getElementById('rightBar').innerHTML = html;
+            });
+            var pages = ['notifications', 'grades', 'vitals', 'attendance'];
+            var pageIndex = 0;
+            document.onkeydown = function (e)
+            {
+                switch (e.keyCode) {
+                    case 39:
+                        pageIndex++;
+                        if (pageIndex >= pages.length)
+                        {
+                            pageIndex = 0;
+                        }
+                        break;
+                    case 37:
+                        pageIndex--;
+                        if (pageIndex < 0)
+                        {
+                            pageIndex = pages.length - 1;
+                        }
+                        break;
+                }
+                setLeftTab(pageIndex);
+            };
+            function setLeftTab(location)
+            {
+                pageIndex = location;
+                for (i = 0; i < pages.length; i++)
+                {
+                    document.getElementById(i).className = "butt";
+                }
+                document.getElementById(location).className = "butt selectedButt";
+                socket.emit('requestPage', pages[location], function (html) {
+                    document.getElementById('leftBar').innerHTML = html;
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <div id="leftTab" style="position: relative; left: -8px; top: -9px;">
+            <button type="button" class="butt selectedButt" onclick="setLeftTab(0)" id="0">Notifications</button>
+            <button type="button" class="butt" onclick="setLeftTab(1)" id="1">Grades</button>
+            <button type="button" class="butt" onclick="setLeftTab(2)" id="2">Vitals</button>
+            <button type="button" class="butt" onclick="setLeftTab(3)" id="3">Attendance</button>
+            <p style="float:right;">Bob <a href="champfish.ddns.net:9000">Logout</a></p>
+        </div>
+        <br/>
+        <div id="leftBar" style="float: left;clear: left;">  
+        </div>
+        <div id="rightBar" style="float: right;">
+        </div>
+        <script>
+            setLeftTab(0);
+        </script>
+    </body>
+</html>
